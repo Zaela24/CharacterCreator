@@ -1,6 +1,7 @@
 class Spells:
     """Initializes general spell attributes"""
     def __init__(self):
+        self.name = "" # Name of spell
         self.spell_level = 0
         self.schools = list()
         self.spell_list = dict() # key=CharacterClass, value=ClassLevel
