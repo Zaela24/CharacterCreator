@@ -20,3 +20,4 @@ class Character:
         self.carry_cap = 0
         self.death_saves = None
         self.speed
+        self.XP = 0
