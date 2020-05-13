@@ -12,3 +12,4 @@ class DnD5e(Character): # D&D 5th edition
         self.feats = dict()
         self.prof_bonus = 0
         self.attuned_items = dict()
+    
