@@ -6,7 +6,7 @@ class Character:
         self.con = 0
         self.int = 0
         self.wis = 0
-        self.char = 0
+        self.cha = 0
         self.AC = 0
         self.HP = 0
         self.hit_dice = 0
