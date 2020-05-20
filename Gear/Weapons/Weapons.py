@@ -3,6 +3,7 @@ class Weapons:
     """Initializes general Weapon attributes across games and weapon types"""
     def __init__(self):
         self.name = "" # item name, example: Dagger
+        self.masterwork = False # can move to Pathfinder exclusive if needed
         self.price = 0 # assuming in gold pieces
         self.expertise_category = "" # Simple, Martial, Exotic
         self.handling = "" # Light, One-Handed, Two-Handed
@@ -13,3 +14,5 @@ class Weapons:
         self.crit_threat = 20 # usually 20 unless otherwise specified
         self.crit_modifer = 2 # usually x2 on a crit hit unless otherwise noted
         self.attack_bonus = 0 # only modified for Masterwork and Magic weapons
+        self.special_qualities = "" # string or list of strings w/ special quals
+                                    #   such as monk, double, reach, brace, etc
