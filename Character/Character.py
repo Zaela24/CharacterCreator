@@ -12,7 +12,7 @@ class Character:
         self.hit_dice = 0
         self.name = None
         self.race = None
-        self.class = None
+        self.character_class = None
         self.skills = ()
         self.religion = None
         self.alignment = None
