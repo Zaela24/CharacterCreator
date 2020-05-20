@@ -11,3 +11,6 @@ class Spells:
         self.effects = None
         self.range = "" # close, medium, far; has value based on caster level
         self.num_targets = 0
+        self.source = "" #caster or external
+        self.shape = "" #sphere, cube, cone, line, etc.
+        self.size = "" #the area of the spells effect
