@@ -14,8 +14,10 @@ class PathfinderCharacter(Character): # 1e Pathfinder
         self.armor = None
         self.shield = None
         self.weapons = list() # list of weapon objects
+        self.bab = 0
         self.cmb = 0
         self.cmd = 0
+        self.ac = 10
         self.touch_ac = 10
         self.flatfoot_ac = 10
         self.skills = list([]) # create matrix w/ ranks, class bonuses, etc
