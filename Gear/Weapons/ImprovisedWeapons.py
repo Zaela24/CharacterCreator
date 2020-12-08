@@ -8,3 +8,6 @@ class ImprovisedWeapons(Weapons):
         """ Makes improvised weapons throwable with specified range increment"""
         self.throwable = True
         self.range = range
+        
+    def setDamage(self, damage):
+        self.damage = damage  # inherited from Weapons class; wrote setter so we don't forget about it
