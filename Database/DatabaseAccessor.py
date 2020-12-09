@@ -3,7 +3,7 @@ import sqlite3
 class CharacterDB:
     def __init__(self, first_connect):
         if first_connect:
-            create_db()
+            self.create_character_table()
         self.db = self.__enter__()
 
     """Returns database connection that should be used in a with statement"""
@@ -18,10 +18,25 @@ class CharacterDB:
         print("connection closed") # debug
         self.database.close()
 
+    def create_character_table():
+        try:
+            self.database.execute('''CREATE TABLE characters
+                (id INT PRIMARY KEY NOT NULL,
+                game TEXT NOT NULL,
+                name TEXT NOT NULL,
+                class TEXT NOT NULL,
+                race TEXT NOT NULL,
+                level INT NOT NULL);''')
+            print("Table created successfully") # debug
+        except Exception as e:
+            if e == "sqlite3.OperationalError: table characters already exists":
+                print("Table already exists")
+            else:
+                print(e)
+
     def get_character_from_id(self, id):
         try:
-            execute_string = '''SELECT * from characters WHERE id = %s
-            ''' % (id)
+            execute_string = '''SELECT * from characters WHERE id = %s;''' % (id)
             character = self.db.execute(execute_string)
         except Exception as e:
             print(e)
@@ -30,31 +45,105 @@ class CharacterDB:
 
     def get_max_character_id(self):
         try:
-            id = self.db.execute("MAX(ID) expression")
+            id = self.db.execute("MAX(ID) expression;")
         except Exception as e:
             id = None
             print(e)
         return id
 
     def get_all_characters(self):
-        db = self.__enter__()
         try:
-            characters = db.execute("SELECT * from characters")
-            print(characters)
+            characters = self.db.execute("SELECT * from characters;")
         except Exception as e:
+            characters = None
             print(e)
+        return characters
 
 
     def create_character(self, name, game, char_class, race, level):
         id = string(int(get_max_character_id())+1)
         try:
             execute_string = '''INSTERT INTO characters \
-            VALUES (%s, %s, %s, %s, %s, %s);
+            VALUES (%d, %s, %s, %s, %s, %s);
             ''' % (id, name, game, char_class, race, level)
+            character = self.db.execute(execute_string)
+            database.commit()
+        except Exception as e:
+            character = None
+            print(e)
+        return character
+
+    def update_character(self, id, key, value):
+        try:
+            execute_string = "UPDATE characters SET %s = %s WHERE id = %d;" % (key, value, id)
+            character = self.db.execute(execute_string)
+            database.commit()
+        except Exception as e:
+            character = None
+            print(e)
+        return character
+
+    def delete_character(self, id):
+        try:
+            execute_string = "DELETE FROM characters WHERE id = %d;" % (id)
+            self.db.execute(execute_string)
+            datbase.commit()
+            return True
         except Exception as e:
             print(e)
+            return False
 
 
+class WeaponDB:
+    def __init__(self, first_connect):
+        if first_connect:
+            create_weapon_tables()
+        self.db = self.__enter__()
+
+    """Returns database connection that should be used in a with statement"""
+    def __enter__(self):
+        # Creates database if it does not already exist, otherwise connects to
+        #   an existing database named weapon.db :
+        self.database = sqlite3.connect("weapon.db")
+        print("connection successful") # debug
+        return self.database
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("connection closed") # debug
+        self.database.close()
+
+    def create_weapon_tables():
+        try:
+            self.database.execute('''CREATE TABLE melee
+            (id INT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            range TEXT NOT NULL,
+            price TEXT,
+            expertise TEXT NOT NULL,
+            handling TEXT NOT NULL,
+            size TEXT NOT NULL,
+            damage_type TEXT NOT NULL,
+            damage_dice TEXT NOT NULL,
+            condition TEXT NOT NULL););''')
+
+            self.database.execute('''CREATE TABLE ranged
+            (id INT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            range TEXT NOT NULL,
+            price TEXT,
+            ammunition TEXT NOT NULL,
+            expertise TEXT NOT NULL,
+            damage_type TEXT NOT NULL,
+            damage_dice TEXT NOT NULL,
+            size TEXT NOT NULL,
+            condition TEXT NOT NULL););''')
+        print("Table created successfully") # debug
+    except Exception as e:
+        if e == "sqlite3.OperationalError: table characters already exists":
+            print("Table already exists")
+        else:
+            print(e)
 
 
 # We will need to figure out what tables we need and just create them when the
