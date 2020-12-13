@@ -36,7 +36,7 @@ class CharacterDB:
 
     def get_character_from_id(self, id):
         try:
-            execute_string = '''SELECT * from characters WHERE id = %s;''' % (id)
+            execute_string = '''SELECT * from characters WHERE id = %d;''' % (id)
             character = self.db.execute(execute_string)
         except Exception as e:
             print(e)
@@ -45,7 +45,7 @@ class CharacterDB:
 
     def get_max_character_id(self):
         try:
-            id = self.db.execute("MAX(ID) expression;")
+            id = self.db.execute("SELECT MAX(id) FROM characters;")
         except Exception as e:
             id = None
             print(e)
@@ -63,11 +63,11 @@ class CharacterDB:
     def create_character(self, name, game, char_class, race, level):
         id = string(int(get_max_character_id())+1)
         try:
-            execute_string = '''INSTERT INTO characters \
+            execute_string = '''INSERT INTO characters \
             VALUES (%d, %s, %s, %s, %s, %s);
             ''' % (id, name, game, char_class, race, level)
             character = self.db.execute(execute_string)
-            database.commit()
+            self.database.commit()
         except Exception as e:
             character = None
             print(e)
@@ -77,7 +77,7 @@ class CharacterDB:
         try:
             execute_string = "UPDATE characters SET %s = %s WHERE id = %d;" % (key, value, id)
             character = self.db.execute(execute_string)
-            database.commit()
+            self.database.commit()
         except Exception as e:
             character = None
             print(e)
@@ -87,7 +87,7 @@ class CharacterDB:
         try:
             execute_string = "DELETE FROM characters WHERE id = %d;" % (id)
             self.db.execute(execute_string)
-            datbase.commit()
+            self.datbase.commit()
             return True
         except Exception as e:
             print(e)
@@ -134,6 +134,7 @@ class WeaponDB:
             price TEXT,
             ammunition TEXT NOT NULL,
             expertise TEXT NOT NULL,
+            handling TEXT NOT NULL,
             damage_type TEXT NOT NULL,
             damage_dice TEXT NOT NULL,
             size TEXT NOT NULL,
@@ -145,6 +146,125 @@ class WeaponDB:
         else:
             print(e)
 
+    def get_melee_weapon_from_id(self, id):
+        try:
+            execute_string = "SELECT * FROM melee WHERE id = %d;" % (id)
+            weapon = self.database.execute(execute_string)
+        except Exception as e:
+            print(e)
+            weapon = None
+        return weapon
+
+    def get_ranged_weapon_from_id(self, id):
+        try:
+            execute_string = "SELECT * FROM ranged WHERE id = %d;" % (id)
+            weapon = self.database.execute(execute_string)
+        except Exception as e:
+            print(e)
+            weapon = None
+        return weapon
+
+    def get_max_melee_id(self):
+        try:
+            id = self.db.execute("SELECT MAX(id) from melee;")
+        except Exception as e:
+            print(e)
+            id = None
+        return id
+
+    def get_max_ranged_id(self):
+        try:
+            id = self.db.execute("SELECT MAX(id) from ranged;")
+        except Exception as e:
+            print(e)
+            id = None
+        return id
+
+    def get_all_melee_weapons(self):
+        try:
+            weapons = self.db.execute("SELECT * from melee;")
+        except Exception as e:
+            print(e)
+            weapons = None
+        return weapons
+
+    def get_all_ranged_weapons(self):
+        try:
+            weapons = self.db.execute("SELECT * from ranged;")
+        except Exception as e:
+            print(e)
+            weapons = None
+        return weapons
+
+    def create_melee_weapon(self, name, range, price, expertise, handling, size,
+        damage_type, damage_dice, condition):
+        id = string(int(get_max_melee_id())+1)
+        try:
+            execute_string = '''INSERT INTO melee \
+            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ''' % (id, name, range, price, expertise, handling, size, damage_type,
+                    damage_dice, condition)
+            weapon = self.db.execute(execute_string)
+            self.database.commit()
+        except Exception as e:
+            weapon = None
+            print(e)
+        return weapon
+
+    def create_ranged_weapon(self, name, range, price, ammunition, expertise,
+        handling, damage_type, damage_dice, size, condition):
+        id = string(int(get_max_ranged_id())+1)
+        try:
+            execute_string = '''INSERT INTO melee \
+            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ''' % (id, name, range, price, ammunition, expertise, handling, size,
+            damage_type, damage_type, damage_dice, size, condition)
+            weapon = self.db.execute(execute_string)
+            sefl.database.commit()
+        except Exception as e:
+            weapon = None
+            print(e)
+        return weapon
+
+    def update_melee_weapon(self, id, key, value):
+        try:
+            execute_string = "UPDATE melee SET %s = %s WHERE id = %d;" % (key, value, id)
+            weapon = self.db.execute(execute_string)
+            self.database.commit()
+        except Excpetion as e:
+            weapon = None
+            print(e)
+        return weapon
+
+    def update_ranged_weapon(self, id, key, value):
+        try:
+            execute_string = "UPDATE ranged SET %s = %s WHERE id = %d;" % (key, value, id)
+            weapon = self.db.execute(execute_string)
+            self.database.commit()
+        except Excpetion as e:
+            weapon = None
+            print(e)
+        return weapon
+
+    def delete_melee_weapon(self, id):
+        try:
+            execute_string = "DELETE FROM melee WHERE id = %d;" % (id)
+            self.db.execute(execute_string)
+            self.database.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def delete_ranged_weapon(self, id):
+        try:
+            execute_string = "DELETE FROM ranged WHERE id = %d;" % (id)
+            self.db.execute(execute_string)
+            self.db.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
 # We will need to figure out what tables we need and just create them when the
 # database is initialized for the first time
