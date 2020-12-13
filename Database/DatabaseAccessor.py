@@ -266,6 +266,8 @@ class WeaponDB:
             print(e)
             return False
 
+
+
 # We will need to figure out what tables we need and just create them when the
 # database is initialized for the first time
 #
