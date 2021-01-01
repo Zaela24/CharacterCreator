@@ -120,6 +120,7 @@ class WeaponDB:
             name TEXT NOT NULL,
             range TEXT NOT NULL,
             price TEXT,
+            weight TEXT NOT NULL,
             expertise TEXT NOT NULL,
             handling TEXT NOT NULL,
             size TEXT NOT NULL,
@@ -132,6 +133,7 @@ class WeaponDB:
             name TEXT NOT NULL,
             range TEXT NOT NULL,
             price TEXT,
+            weight TEXT NOT NULL,
             ammunition TEXT NOT NULL,
             expertise TEXT NOT NULL,
             handling TEXT NOT NULL,
@@ -141,7 +143,7 @@ class WeaponDB:
             condition TEXT NOT NULL););''')
         print("Table created successfully") # debug
     except Exception as e:
-        if e == "sqlite3.OperationalError: table characters already exists":
+        if e == "sqlite3.OperationalError: tables melee and ranged already exists":
             print("Table already exists")
         else:
             print(e)
@@ -196,13 +198,13 @@ class WeaponDB:
             weapons = None
         return weapons
 
-    def create_melee_weapon(self, name, range, price, expertise, handling, size,
+    def create_melee_weapon(self, name, range, price, weight, expertise, handling, size,
         damage_type, damage_dice, condition):
         id = string(int(get_max_melee_id())+1)
         try:
             execute_string = '''INSERT INTO melee \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, range, price, expertise, handling, size, damage_type,
+            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ''' % (id, name, range, price, weight, expertise, handling, size, damage_type,
                     damage_dice, condition)
             weapon = self.db.execute(execute_string)
             self.database.commit()
@@ -216,8 +218,8 @@ class WeaponDB:
         id = string(int(get_max_ranged_id())+1)
         try:
             execute_string = '''INSERT INTO melee \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, range, price, ammunition, expertise, handling, size,
+            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ''' % (id, name, range, price, weight, ammunition, expertise, handling, size,
             damage_type, damage_type, damage_dice, size, condition)
             weapon = self.db.execute(execute_string)
             sefl.database.commit()
@@ -267,6 +269,87 @@ class WeaponDB:
             return False
 
 
+class ShieldDB:
+    def create_shield_tables():
+        try:
+            self.database.execute('''CREATE TABLE shield
+            (id INT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            masterwork TEXT NOT NULL,
+            ac_bonus TEXT NOT NULL,
+            weight TEXT NOT NULL,
+            price TEXT,
+            condition TEXT NOT NULL,
+            check_penalty TEXT NOT NULL,
+            arcane_failure_chance TEXT NOT NULL,
+            max_dex_mod TEXT NOT NULL););''')
+
+        print("Table created successfully") # debug
+    except Exception as e:
+        if e == "sqlite3.OperationalError: table shield already exists":
+            print("Table already exists")
+        else:
+            print(e)
+
+    def get_shield_from_id(self, id):
+        try:
+            execute_string = "SELECT * FROM shield WHERE id = %d;" % (id)
+            shield = self.database.execute(execute_string)
+        except Exception as e:
+            print(e)
+            shield = None
+        return shield
+
+    def get_max_shield_id(self):
+        try:
+            id = self.db.execute("SELECT MAX(id) from shield;")
+        except Exception as e:
+            print(e)
+            id = None
+        return id
+
+    def get_all_shields(self):
+        try:
+            shields = self.db.execute("SELECT * from shield;")
+        except Exception as e:
+            print(e)
+            shields = None
+        return shields
+
+    def create_shield(self, name, masterwork, ac_bonus, weight, price, condition,
+        check_penalty, arcane_failure_chance, max_dex_mod):
+        id = string(int(get_max_shield_id())+1)
+        try:
+            execute_string = '''INSERT INTO shield \
+            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ''' % (id, name, masterwork, ac_bonus, weight, price, condition, check_penalty,
+                arcane_failure_chance, max_dex_mod)
+            shield = self.db.execute(execute_string)
+            self.database.commit()
+        except Exception as e:
+            shield = None
+            print(e)
+        return shield
+
+    def update_shield(self, id, key, value):
+        try:
+            execute_string = "UPDATE shield SET %s = %s WHERE id = %d;" % (key, value, id)
+            shield = self.db.execute(execute_string)
+            self.database.commit()
+        except Excpetion as e:
+            shield = None
+            print(e)
+        return shield
+
+    def delete_shield(self, id):
+        try:
+            execute_string = "DELETE FROM shield WHERE id = %d;" % (id)
+            self.db.execute(execute_string)
+            self.database.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
 # We will need to figure out what tables we need and just create them when the
 # database is initialized for the first time
