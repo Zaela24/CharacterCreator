@@ -351,6 +351,91 @@ class ShieldDB:
             print(e)
             return False
 
+class ArmorDB:
+    def create_armor_tables():
+        try:
+            self.database.execute('''CREATE TABLE armor
+            (id INT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            masterwork TEXT NOT NULL,
+            ac_bonus TEXT NOT NULL,
+            weight TEXT NOT NULL,
+            price TEXT,
+            category TEXT NOT NULL,
+            condition TEXT NOT NULL,
+            check_penalty TEXT NOT NULL,
+            arcane_failure_chance TEXT NOT NULL,
+            max_dex_mod TEXT NOT NULL););''')
+
+        print("Table created successfully") # debug
+    except Exception as e:
+        if e == "sqlite3.OperationalError: table armor already exists":
+            print("Table already exists")
+        else:
+            print(e)
+
+    def get_armor_from_id(self, id):
+        try:
+            execute_string = "SELECT * FROM armor WHERE id = %d;" % (id)
+            armor = self.database.execute(execute_string)
+        except Exception as e:
+            print(e)
+            armor = None
+        return armor
+
+    def get_max_armor_id(self):
+        try:
+            id = self.db.execute("SELECT MAX(id) from armor;")
+        except Exception as e:
+            print(e)
+            id = None
+        return id
+
+    def get_all_armor(self):
+        try:
+            armors = self.db.execute("SELECT * from armor;")
+        except Exception as e:
+            print(e)
+            armors = None
+        return armors
+
+    def create_armor(self, name, masterwork, ac_bonus, weight, price, category, condition,
+        check_penalty, arcane_failure_chance, max_dex_mod):
+        id = string(int(get_max_armor_id())+1)
+        try:
+            execute_string = '''INSERT INTO armor \
+            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ''' % (id, name, masterwork, ac_bonus, weight, price, category, condition, check_penalty,
+                arcane_failure_chance, max_dex_mod)
+            armor = self.db.execute(execute_string)
+            self.database.commit()
+        except Exception as e:
+            armor = None
+            print(e)
+        return armor
+
+    def update_armor(self, id, key, value):
+        try:
+            execute_string = "UPDATE armor SET %s = %s WHERE id = %d;" % (key, value, id)
+            armor = self.db.execute(execute_string)
+            self.database.commit()
+        except Excpetion as e:
+            armor = None
+            print(e)
+        return armor
+
+    def delete_armor(self, id):
+        try:
+            execute_string = "DELETE FROM armor WHERE id = %d;" % (id)
+            self.db.execute(execute_string)
+            self.database.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+
+            
 # We will need to figure out what tables we need and just create them when the
 # database is initialized for the first time
 #
