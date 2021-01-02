@@ -36,7 +36,7 @@ class CharacterDB:
 
     def get_character_from_id(self, id):
         try:
-            execute_string = '''SELECT * from characters WHERE id = %d;''' % (id)
+            execute_string = '''SELECT * from characters WHERE id = {};'''.format(id)
             character = self.db.execute(execute_string)
         except Exception as e:
             print(e)
@@ -64,8 +64,8 @@ class CharacterDB:
         id = string(int(get_max_character_id())+1)
         try:
             execute_string = '''INSERT INTO characters \
-            VALUES (%d, %s, %s, %s, %s, %s);
-            ''' % (id, name, game, char_class, race, level)
+            VALUES ({}, {}, {}, {}, {}, {});
+            '''.format(id, name, game, char_class, race, level)
             character = self.db.execute(execute_string)
             self.database.commit()
         except Exception as e:
@@ -75,7 +75,7 @@ class CharacterDB:
 
     def update_character(self, id, key, value):
         try:
-            execute_string = "UPDATE characters SET %s = %s WHERE id = %d;" % (key, value, id)
+            execute_string = "UPDATE characters SET {} = {} WHERE id = {};".format(key, value, id)
             character = self.db.execute(execute_string)
             self.database.commit()
         except Exception as e:
@@ -85,7 +85,7 @@ class CharacterDB:
 
     def delete_character(self, id):
         try:
-            execute_string = "DELETE FROM characters WHERE id = %d;" % (id)
+            execute_string = "DELETE FROM characters WHERE id = {};".format(id)
             self.db.execute(execute_string)
             self.datbase.commit()
             return True
@@ -150,7 +150,7 @@ class WeaponDB:
 
     def get_melee_weapon_from_id(self, id):
         try:
-            execute_string = "SELECT * FROM melee WHERE id = %d;" % (id)
+            execute_string = "SELECT * FROM melee WHERE id = {};".format(id)
             weapon = self.database.execute(execute_string)
         except Exception as e:
             print(e)
@@ -159,7 +159,7 @@ class WeaponDB:
 
     def get_ranged_weapon_from_id(self, id):
         try:
-            execute_string = "SELECT * FROM ranged WHERE id = %d;" % (id)
+            execute_string = "SELECT * FROM ranged WHERE id = {};".format(id)
             weapon = self.database.execute(execute_string)
         except Exception as e:
             print(e)
@@ -203,8 +203,8 @@ class WeaponDB:
         id = string(int(get_max_melee_id())+1)
         try:
             execute_string = '''INSERT INTO melee \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, range, price, weight, expertise, handling, size, damage_type,
+            VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+            '''.format(id, name, range, price, weight, expertise, handling, size, damage_type,
                     damage_dice, condition)
             weapon = self.db.execute(execute_string)
             self.database.commit()
@@ -218,8 +218,8 @@ class WeaponDB:
         id = string(int(get_max_ranged_id())+1)
         try:
             execute_string = '''INSERT INTO melee \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, range, price, weight, ammunition, expertise, handling, size,
+            VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+            '''.format(id, name, range, price, weight, ammunition, expertise, handling, size,
             damage_type, damage_type, damage_dice, size, condition)
             weapon = self.db.execute(execute_string)
             sefl.database.commit()
@@ -230,7 +230,7 @@ class WeaponDB:
 
     def update_melee_weapon(self, id, key, value):
         try:
-            execute_string = "UPDATE melee SET %s = %s WHERE id = %d;" % (key, value, id)
+            execute_string = "UPDATE melee SET {} = {} WHERE id = {};".format(key, value, id)
             weapon = self.db.execute(execute_string)
             self.database.commit()
         except Excpetion as e:
@@ -240,7 +240,7 @@ class WeaponDB:
 
     def update_ranged_weapon(self, id, key, value):
         try:
-            execute_string = "UPDATE ranged SET %s = %s WHERE id = %d;" % (key, value, id)
+            execute_string = "UPDATE ranged SET {} = {} WHERE id = {};".format(key, value, id)
             weapon = self.db.execute(execute_string)
             self.database.commit()
         except Excpetion as e:
@@ -250,7 +250,7 @@ class WeaponDB:
 
     def delete_melee_weapon(self, id):
         try:
-            execute_string = "DELETE FROM melee WHERE id = %d;" % (id)
+            execute_string = "DELETE FROM melee WHERE id = {};".format(id)
             self.db.execute(execute_string)
             self.database.commit()
             return True
@@ -260,7 +260,7 @@ class WeaponDB:
 
     def delete_ranged_weapon(self, id):
         try:
-            execute_string = "DELETE FROM ranged WHERE id = %d;" % (id)
+            execute_string = "DELETE FROM ranged WHERE id = {};".format(id)
             self.db.execute(execute_string)
             self.db.commit()
             return True
@@ -270,19 +270,37 @@ class WeaponDB:
 
 
 class ShieldDB:
-    def create_shield_tables():
+    def __init__(self, first_connect):
+        if first_connect:
+            create_shield_table()
+        self.db = self.__enter__()
+
+    """Returns database connection that should be used in a with statement"""
+    def __enter__(self):
+        # Creates database if it does not already exist, otherwise connects to
+        #   an existing database named weapon.db :
+        self.database = sqlite3.connect("shield.db")
+        print("connection successful") # debug
+        return self.database
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("connection closed") # debug
+        self.database.close()
+
+    def create_shield_table():
         try:
             self.database.execute('''CREATE TABLE shield
             (id INT PRIMARY KEY NOT NULL,
             name TEXT NOT NULL,
             masterwork TEXT NOT NULL,
-            ac_bonus TEXT NOT NULL,
+            ac_bonus INT NOT NULL,
             weight TEXT NOT NULL,
             price TEXT,
             condition TEXT NOT NULL,
-            check_penalty TEXT NOT NULL,
-            arcane_failure_chance TEXT NOT NULL,
-            max_dex_mod TEXT NOT NULL););''')
+            check_penalty INT NOT NULL,
+            arcane_failure_chance INT NOT NULL,
+            max_dex_mod INT NOT NULL););''')
 
         print("Table created successfully") # debug
     except Exception as e:
@@ -293,7 +311,7 @@ class ShieldDB:
 
     def get_shield_from_id(self, id):
         try:
-            execute_string = "SELECT * FROM shield WHERE id = %d;" % (id)
+            execute_string = "SELECT * FROM shield WHERE id = {};".format(id)
             shield = self.database.execute(execute_string)
         except Exception as e:
             print(e)
@@ -321,8 +339,8 @@ class ShieldDB:
         id = string(int(get_max_shield_id())+1)
         try:
             execute_string = '''INSERT INTO shield \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, masterwork, ac_bonus, weight, price, condition, check_penalty,
+            VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+            '''.format(id, name, masterwork, ac_bonus, weight, price, condition, check_penalty,
                 arcane_failure_chance, max_dex_mod)
             shield = self.db.execute(execute_string)
             self.database.commit()
@@ -333,7 +351,7 @@ class ShieldDB:
 
     def update_shield(self, id, key, value):
         try:
-            execute_string = "UPDATE shield SET %s = %s WHERE id = %d;" % (key, value, id)
+            execute_string = "UPDATE shield SET {} = {} WHERE id = {};".format(key, value, id)
             shield = self.db.execute(execute_string)
             self.database.commit()
         except Excpetion as e:
@@ -343,7 +361,7 @@ class ShieldDB:
 
     def delete_shield(self, id):
         try:
-            execute_string = "DELETE FROM shield WHERE id = %d;" % (id)
+            execute_string = "DELETE FROM shield WHERE id = {};".format(id)
             self.db.execute(execute_string)
             self.database.commit()
             return True
@@ -352,20 +370,38 @@ class ShieldDB:
             return False
 
 class ArmorDB:
-    def create_armor_tables():
+    def __init__(self, first_connect):
+        if first_connect:
+            create_armor_table()
+        self.db = self.__enter__()
+
+    """Returns database connection that should be used in a with statement"""
+    def __enter__(self):
+        # Creates database if it does not already exist, otherwise connects to
+        #   an existing database named weapon.db :
+        self.database = sqlite3.connect("armor.db")
+        print("connection successful") # debug
+        return self.database
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("connection closed") # debug
+        self.database.close()
+
+    def create_armor_table():
         try:
             self.database.execute('''CREATE TABLE armor
             (id INT PRIMARY KEY NOT NULL,
             name TEXT NOT NULL,
             masterwork TEXT NOT NULL,
-            ac_bonus TEXT NOT NULL,
+            ac_bonus INT NOT NULL,
             weight TEXT NOT NULL,
             price TEXT,
             category TEXT NOT NULL,
             condition TEXT NOT NULL,
-            check_penalty TEXT NOT NULL,
-            arcane_failure_chance TEXT NOT NULL,
-            max_dex_mod TEXT NOT NULL););''')
+            check_penalty INT NOT NULL,
+            arcane_failure_chance INT NOT NULL,
+            max_dex_mod INT NOT NULL););''')
 
         print("Table created successfully") # debug
     except Exception as e:
@@ -376,7 +412,7 @@ class ArmorDB:
 
     def get_armor_from_id(self, id):
         try:
-            execute_string = "SELECT * FROM armor WHERE id = %d;" % (id)
+            execute_string = "SELECT * FROM armor WHERE id = {};".format(id)
             armor = self.database.execute(execute_string)
         except Exception as e:
             print(e)
@@ -404,8 +440,8 @@ class ArmorDB:
         id = string(int(get_max_armor_id())+1)
         try:
             execute_string = '''INSERT INTO armor \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, masterwork, ac_bonus, weight, price, category, condition, check_penalty,
+            VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+            '''.format(id, name, masterwork, ac_bonus, weight, price, category, condition, check_penalty,
                 arcane_failure_chance, max_dex_mod)
             armor = self.db.execute(execute_string)
             self.database.commit()
@@ -416,7 +452,7 @@ class ArmorDB:
 
     def update_armor(self, id, key, value):
         try:
-            execute_string = "UPDATE armor SET %s = %s WHERE id = %d;" % (key, value, id)
+            execute_string = "UPDATE armor SET {} = {} WHERE id = {};".format(key, value, id)
             armor = self.db.execute(execute_string)
             self.database.commit()
         except Excpetion as e:
@@ -426,90 +462,7 @@ class ArmorDB:
 
     def delete_armor(self, id):
         try:
-            execute_string = "DELETE FROM armor WHERE id = %d;" % (id)
-            self.db.execute(execute_string)
-            self.database.commit()
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
-class ArmorDB:
-    def create_armor_tables():
-        try:
-            self.database.execute('''CREATE TABLE armor
-            (id INT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL,
-            masterwork TEXT NOT NULL,
-            ac_bonus TEXT NOT NULL,
-            weight TEXT NOT NULL,
-            price TEXT,
-            category TEXT NOT NULL,
-            condition TEXT NOT NULL,
-            check_penalty TEXT NOT NULL,
-            arcane_failure_chance TEXT NOT NULL,
-            max_dex_mod TEXT NOT NULL););''')
-
-        print("Table created successfully") # debug
-    except Exception as e:
-        if e == "sqlite3.OperationalError: table armor already exists":
-            print("Table already exists")
-        else:
-            print(e)
-
-    def get_armor_from_id(self, id):
-        try:
-            execute_string = "SELECT * FROM armor WHERE id = %d;" % (id)
-            armor = self.database.execute(execute_string)
-        except Exception as e:
-            print(e)
-            armor = None
-        return armor
-
-    def get_max_armor_id(self):
-        try:
-            id = self.db.execute("SELECT MAX(id) from armor;")
-        except Exception as e:
-            print(e)
-            id = None
-        return id
-
-    def get_all_armor(self):
-        try:
-            armors = self.db.execute("SELECT * from armor;")
-        except Exception as e:
-            print(e)
-            armors = None
-        return armors
-
-    def create_armor(self, name, masterwork, ac_bonus, weight, price, category, condition,
-        check_penalty, arcane_failure_chance, max_dex_mod):
-        id = string(int(get_max_armor_id())+1)
-        try:
-            execute_string = '''INSERT INTO armor \
-            VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            ''' % (id, name, masterwork, ac_bonus, weight, price, category, condition, check_penalty,
-                arcane_failure_chance, max_dex_mod)
-            armor = self.db.execute(execute_string)
-            self.database.commit()
-        except Exception as e:
-            armor = None
-            print(e)
-        return armor
-
-    def update_armor(self, id, key, value):
-        try:
-            execute_string = "UPDATE armor SET %s = %s WHERE id = %d;" % (key, value, id)
-            armor = self.db.execute(execute_string)
-            self.database.commit()
-        except Excpetion as e:
-            armor = None
-            print(e)
-        return armor
-
-    def delete_armor(self, id):
-        try:
-            execute_string = "DELETE FROM armor WHERE id = %d;" % (id)
+            execute_string = "DELETE FROM armor WHERE id = {};".format(id)
             self.db.execute(execute_string)
             self.database.commit()
             return True
@@ -518,7 +471,25 @@ class ArmorDB:
             return False
 
 class SpellDB:
-    def create_spell_tables():
+    def __init__(self, first_connect):
+        if first_connect:
+            create_spell_table()
+        self.db = self.__enter__()
+
+    """Returns database connection that should be used in a with statement"""
+    def __enter__(self):
+        # Creates database if it does not already exist, otherwise connects to
+        #   an existing database named weapon.db :
+        self.database = sqlite3.connect("spell.db")
+        print("connection successful") # debug
+        return self.database
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("connection closed") # debug
+        self.database.close()
+
+    def create_spell_table():
         try:
             self.database.execute('''CREATE TABLE spell
             (id INT PRIMARY KEY NOT NULL,
@@ -545,7 +516,7 @@ class SpellDB:
 
     def get_spell_from_id(self, id):
         try:
-            execute_string = "SELECT * FROM spell WHERE id = %d;" % (id)
+            execute_string = "SELECT * FROM spell WHERE id = {};".format(id)
             spell = self.database.execute(execute_string)
         except Exception as e:
             print(e)
